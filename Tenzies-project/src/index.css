@@ -216,6 +216,27 @@ button.roll-dice:active {
   transform: scale(0.95);
 }
 
+.win-msg, .lose-msg {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 10px 0;
+  padding: 5px 15px;
+  border-radius: 8px;
+  animation: popIn 0.3s ease-out;
+}
+
+.win-msg {
+  color: #0b2535;
+  background-color: #35ffa1;
+  box-shadow: 0px 4px 10px rgba(53, 255, 161, 0.4);
+}
+
+.lose-msg {
+  color: #fff;
+  background-color: #ff3535;
+  box-shadow: 0px 4px 10px rgba(255, 53, 53, 0.4);
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -240,6 +261,17 @@ button.roll-dice:active {
   }
   100% {
     transform: rotate(0deg);
+  }
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
   }
 }
 

@@ -10,13 +10,13 @@ export default function App() {
   const [isActive, setIsActive] = useState(false);
   const buttonRef = useRef(null);
 
-  const gameWon =
-    dice.every((die) => die.isHeld) &&
-    dice.every((die) => die.value === dice[0].value);
+  const allHeld = dice.every((die) => die.isHeld);
+  const gameWon = allHeld && dice.every((die) => die.value === dice[0].value);
+  const gameLost = allHeld && !gameWon;
 
   useEffect(() => {
     let interval = null;
-    if (isActive && !gameWon) {
+    if (isActive && !gameWon && !gameLost) {
       interval = setInterval(() => {
         setSeconds((prevSeconds) => prevSeconds + 1);
       }, 1000);
@@ -27,11 +27,11 @@ export default function App() {
   }, [isActive, gameWon]);
 
   useEffect(() => {
-    if (gameWon) {
+    if (gameWon || gameLost ) {
       buttonRef.current.focus();
       setIsActive(false);
     }
-  }, [gameWon]);
+  }, [gameWon, gameLost]);
 
   function generateAllNewDice() {
     return new Array(10).fill(0).map(() => ({
@@ -42,7 +42,7 @@ export default function App() {
   }
 
   function rollDice() {
-    if (!gameWon) {
+    if (!gameWon && !gameLost ) {
       setRolls((prevRolls) => prevRolls + 1);
       setDice((oldDice) =>
         oldDice.map((die) =>
@@ -59,7 +59,7 @@ export default function App() {
   }
 
   function hold(id) {
-    if (!gameWon) {
+    if (!gameWon  && !gameLost) {
       if (!isActive) setIsActive(true);
       setDice((oldDice) =>
         oldDice.map((die) =>
@@ -80,17 +80,26 @@ export default function App() {
 
   return (
     <main>
-      {gameWon && <Confetti />}
+      {gameWon && <Confetti recycle={false} numberOfPieces={1000} />}
       <div aria-live="polite" className="sr-only">
         {gameWon && (
           <p>Congratulations! You won! Press "New Game" to start again.</p>
         )}
+        {gameLost && (
+          <p>Game Over! The dice don't match. Press "New Game" to try again.</p>
+        )}
       </div>
       <h1 className="title">Tenzies</h1>
-      <p className="instructions">
-        Roll until all dice are the same. Click each die to freeze it at its
-        current value between rolls.
-      </p>
+
+      {gameWon && <p className="win-msg">You Won! 🎉</p>}
+      {gameLost && <p className="lose-msg">You Lost! 😞</p>}
+
+      {!gameWon && !gameLost && (
+        <p className="instructions">
+          Roll until all dice are the same. Click each die to freeze it at its
+          current value between rolls.
+        </p>
+      )}
 
       <div className="stats-container">
         <div className="rolls">Rolls: {rolls}</div>
@@ -99,7 +108,7 @@ export default function App() {
 
       <div className="dice-container">{diceElements}</div>
       <button ref={buttonRef} className="roll-dice" onClick={rollDice}>
-        {gameWon ? "New Game" : "Roll"}
+        {gameWon || gameLost ? "New Game" : "Roll"}
       </button>
     </main>
   );
